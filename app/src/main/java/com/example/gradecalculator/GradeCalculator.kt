@@ -1,10 +1,5 @@
 package com.example.gradecalculator
 
-/**
- * Grade Calculator Library
- * Provides functionality to calculate grades and GPA based on marks
- */
-
 data class GradeResult(
     val name: String,
     val marks: Int,
@@ -13,9 +8,7 @@ data class GradeResult(
 )
 
 object GradeCalculator {
-    /**
-     * Calculate grade letter based on marks
-     */
+
     fun calculateGrade(marks: Int): String {
         return when {
             marks in 80..100 -> "A"
@@ -29,9 +22,6 @@ object GradeCalculator {
         }
     }
 
-    /**
-     * Calculate GPA based on marks
-     */
     fun calculateGPA(marks: Int): Double {
         return when {
             marks in 80..100 -> 4.0
@@ -45,9 +35,6 @@ object GradeCalculator {
         }
     }
 
-    /**
-     * Process a student record and return GradeResult
-     */
     fun processStudent(name: String, marks: Int): GradeResult {
         return GradeResult(
             name = name,
@@ -55,5 +42,9 @@ object GradeCalculator {
             grade = calculateGrade(marks),
             gpa = calculateGPA(marks)
         )
+    }
+
+    fun processAllStudents(students: List<Pair<String, Int>>): List<GradeResult> {
+        return students.map { (name, marks) -> processStudent(name, marks) }
     }
 }
