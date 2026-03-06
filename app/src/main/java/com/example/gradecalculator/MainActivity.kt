@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var buttonProcess: Button
     private lateinit var progressBar: ProgressBar
     private lateinit var textViewStatus: TextView
-    private lateinit var textViewSummary: TextView   // <-- new
+    private lateinit var textViewSummary: TextView
 
     private var inputFileUri: Uri? = null
 
@@ -92,7 +92,6 @@ class MainActivity : AppCompatActivity() {
         uri.lastPathSegment ?: "Unknown"
     }
 
-    // ================== FUNCTIONAL REFACTOR ==================
     private fun processExcelFiles(inputUri: Uri, outputUri: Uri) {
         progressBar.visibility = ProgressBar.VISIBLE
         textViewStatus.text = "Processing..."
@@ -106,9 +105,8 @@ class MainActivity : AppCompatActivity() {
                     val workbook = WorkbookFactory.create(inputStream)
                     val sheet = workbook.getSheetAt(0)
 
-                    // 1. Extract data using functional pipeline (sequence + map/filter)
                     val rawPairs = sheet.asSequence()
-                        .drop(1)   // skip header row
+                        .drop(1)
                         .filter { row -> row.physicalNumberOfCells >= 2 }
                         .mapNotNull { row ->
                             val nameCell = row.getCell(0)
@@ -120,20 +118,17 @@ class MainActivity : AppCompatActivity() {
                                     marksCell.cellType.name == "NUMERIC" -> marksCell.numericCellValue.toInt()
                                     else -> marksCell.toString().toIntOrNull() ?: 0
                                 }
-                                name to marks   // return a Pair
+                                name to marks
                             }
                         }
-                        .toList()   // materialize the sequence
+                        .toList()
 
-                    // 2. Process all students with the functional helper from GradeCalculator
                     val gradeResults = GradeCalculator.processAllStudents(rawPairs)
 
-                    // 3. Write output Excel (using forEachIndexed, which is functional)
                     contentResolver.openOutputStream(outputUri)?.use { outputStream ->
                         val outputWorkbook = XSSFWorkbook()
                         val outputSheet = outputWorkbook.createSheet("Sheet1")
 
-                        // Header row
                         outputSheet.createRow(0).apply {
                             createCell(0).setCellValue("Name")
                             createCell(1).setCellValue("Marks")
@@ -141,7 +136,6 @@ class MainActivity : AppCompatActivity() {
                             createCell(3).setCellValue("GPA")
                         }
 
-                        // Data rows – functional loop
                         gradeResults.forEachIndexed { index, result ->
                             outputSheet.createRow(index + 1).apply {
                                 createCell(0).setCellValue(result.name)
@@ -151,7 +145,6 @@ class MainActivity : AppCompatActivity() {
                             }
                         }
 
-                        // Auto‑size columns – still a loop, but we can make it functional too
                         (0..3).forEach { col -> outputSheet.autoSizeColumn(col) }
 
                         outputWorkbook.write(outputStream)
@@ -159,7 +152,6 @@ class MainActivity : AppCompatActivity() {
                     }
                     workbook.close()
 
-                    // 4. Compute summary using functional operations
                     val avgGpa = gradeResults.map { it.gpa }.average()
                     val maxGpa = gradeResults.maxOfOrNull { it.gpa } ?: 0.0
                     val gradeCounts = gradeResults.groupBy { it.grade }
@@ -174,7 +166,6 @@ class MainActivity : AppCompatActivity() {
                         }
                     }
 
-                    // 5. Update UI on main thread
                     runOnUiThread {
                         progressBar.visibility = ProgressBar.GONE
                         textViewStatus.text = "Success! Processed ${gradeResults.size} student(s)."
