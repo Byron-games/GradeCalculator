@@ -25,11 +25,7 @@ import java.awt.datatransfer.DataFlavor
 import java.awt.dnd.*
 import java.io.File
 
-// ── Your own CompositionLocal for the AWT window ──────────────────────────────
-// Provided in Main.kt via CompositionLocalProvider(LocalAwtWindow provides window)
 val LocalAwtWindow = compositionLocalOf<Window?> { null }
-
-// ── Colour palette ────────────────────────────────────────────────────────────
 
 object AppColors {
     val Primary       = Color(0xFF1E3A8A)
@@ -55,8 +51,6 @@ object AppColors {
     }
 }
 
-// ── File Drop Zone ────────────────────────────────────────────────────────────
-
 @Composable
 fun FileDropZone(
     onPickFile: () -> Unit,
@@ -64,7 +58,6 @@ fun FileDropZone(
 ) {
     var isDraggingOver by remember { mutableStateOf(false) }
 
-    // Use our own CompositionLocal instead of the internal LocalWindow
     val window = LocalAwtWindow.current
 
     DisposableEffect(window) {
@@ -149,8 +142,6 @@ fun FileDropZone(
     }
 }
 
-// ── Stat Card ─────────────────────────────────────────────────────────────────
-
 @Composable
 fun StatCard(label: String, value: String, valueColor: Color = AppColors.TextPrimary) {
     Card(
@@ -170,8 +161,6 @@ fun StatCard(label: String, value: String, valueColor: Color = AppColors.TextPri
     }
 }
 
-// ── Grade Badge ───────────────────────────────────────────────────────────────
-
 @Composable
 fun GradeBadge(grade: String, level: GradeLevel) {
     Box(
@@ -185,8 +174,6 @@ fun GradeBadge(grade: String, level: GradeLevel) {
         Text(grade, fontSize = 13.sp, fontWeight = FontWeight.Bold, color = AppColors.forGrade(level))
     }
 }
-
-// ── Results Table ─────────────────────────────────────────────────────────────
 
 @Composable
 fun ResultsTableHeader() {
@@ -228,8 +215,6 @@ fun ResultsTableRow(result: GradeResult, index: Int) {
     HorizontalDivider(color = AppColors.Divider, thickness = 0.5.dp)
 }
 
-// ── Export Success Banner ─────────────────────────────────────────────────────
-
 @Composable
 fun ExportSuccessBanner(path: String, onDismiss: () -> Unit) {
     Card(
@@ -249,8 +234,6 @@ fun ExportSuccessBanner(path: String, onDismiss: () -> Unit) {
     }
 }
 
-// ── Error Banner ──────────────────────────────────────────────────────────────
-
 @Composable
 fun ErrorBanner(message: String, onRetry: () -> Unit) {
     Card(
@@ -266,8 +249,6 @@ fun ErrorBanner(message: String, onRetry: () -> Unit) {
         }
     }
 }
-
-// ── Section Title ─────────────────────────────────────────────────────────────
 
 @Composable
 fun SectionTitle(text: String) {
