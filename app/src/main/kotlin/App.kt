@@ -46,8 +46,6 @@ fun App(viewModel: AppViewModel = remember { AppViewModel() }) {
     }
 }
 
-// ── Top Bar ───────────────────────────────────────────────────────────────────
-
 @Composable
 private fun TopBar() {
     Box(
@@ -65,7 +63,6 @@ private fun TopBar() {
     }
 }
 
-// ── Idle Screen ───────────────────────────────────────────────────────────────
 @Composable
 private fun IdleScreen(viewModel: AppViewModel) {
     var showFilePicker by remember { mutableStateOf(false) }
@@ -75,7 +72,7 @@ private fun IdleScreen(viewModel: AppViewModel) {
             SectionTitle("Upload Student Data")
             FileDropZone(
                 onPickFile = { showFilePicker = true },
-                onDropFile = { file -> viewModel.loadFile(file) }   // ← wire up drop
+                onDropFile = { file -> viewModel.loadFile(file) }   
             )
             InstructionsCard()
         }
@@ -87,20 +84,18 @@ private fun IdleScreen(viewModel: AppViewModel) {
             filter = { _, name -> name.endsWith(".xlsx", ignoreCase = true)
                     || name.endsWith(".xls",  ignoreCase = true) },
             onResult = { file ->
-                showFilePicker = false          // ← always reset, even on cancel
+                showFilePicker = false          
                 file?.let { viewModel.loadFile(it) }
             }
         )
     }
 }
 
-// ── Loaded Screen ─────────────────────────────────────────────────────────────
-
 @Composable
 private fun LoadedScreen(state: AppUiState.Loaded, viewModel: AppViewModel) {
     ContentWrapper {
         Column(verticalArrangement = Arrangement.spacedBy(20.dp)) {
-            // File info banner
+        
             Card(
                 modifier = Modifier.fillMaxWidth(),
                 shape    = RoundedCornerShape(12.dp),
@@ -118,7 +113,7 @@ private fun LoadedScreen(state: AppUiState.Loaded, viewModel: AppViewModel) {
             }
 
             SectionTitle("Preview (first 10 students)")
-            // Preview table
+            
             Card(
                 modifier  = Modifier.fillMaxWidth(),
                 shape     = RoundedCornerShape(12.dp),
@@ -156,7 +151,6 @@ private fun LoadedScreen(state: AppUiState.Loaded, viewModel: AppViewModel) {
                 }
             }
 
-            // Action button
             Button(
                 onClick  = viewModel::processGrades,
                 modifier = Modifier.align(Alignment.End),
@@ -171,8 +165,6 @@ private fun LoadedScreen(state: AppUiState.Loaded, viewModel: AppViewModel) {
     }
 }
 
-// ── Processed Screen ──────────────────────────────────────────────────────────
-
 @Composable
 private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel) {
     var showExportDialog by remember { mutableStateOf(false) }
@@ -180,7 +172,7 @@ private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel
     var showFileSaver    by remember { mutableStateOf(false) }
 
     Column(modifier = Modifier.fillMaxSize()) {
-        // Stats row
+     
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -201,7 +193,6 @@ private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Export buttons
                 Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
                     Button(
                         onClick = {
@@ -231,7 +222,6 @@ private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel
             }
         }
 
-        // Results table
         Box(modifier = Modifier.weight(1f).padding(horizontal = 24.dp, vertical = 12.dp)) {
             Card(
                 modifier  = Modifier.fillMaxSize(),
@@ -249,7 +239,6 @@ private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel
             }
         }
 
-        // Bottom bar
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -267,7 +256,6 @@ private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel
         }
     }
 
-    // Save file dialog
     if (showFileSaver) {
         val ext         = if (pendingFormat == ExportFormat.EXCEL) "xlsx" else "pdf"
         val defaultName = "grades_${state.sourceFile.nameWithoutExtension}.$ext"
@@ -282,16 +270,12 @@ private fun ProcessedScreen(state: AppUiState.Processed, viewModel: AppViewModel
     }
 }
 
-// ── Error Screen ──────────────────────────────────────────────────────────────
-
 @Composable
 private fun ErrorScreen(message: String, viewModel: AppViewModel) {
     ContentWrapper {
         ErrorBanner(message = message, onRetry = viewModel::reset)
     }
 }
-
-// ── Export Success Screen ─────────────────────────────────────────────────────
 
 @Composable
 private fun ExportSuccessScreen(state: AppUiState.ExportSuccess, viewModel: AppViewModel) {
@@ -311,8 +295,6 @@ private fun ExportSuccessScreen(state: AppUiState.ExportSuccess, viewModel: AppV
     }
 }
 
-// ── Loading Screen ────────────────────────────────────────────────────────────
-
 @Composable
 private fun LoadingScreen() {
     Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -322,8 +304,6 @@ private fun LoadingScreen() {
         }
     }
 }
-
-// ── Instructions Card ─────────────────────────────────────────────────────────
 
 @Composable
 private fun InstructionsCard() {
@@ -355,8 +335,6 @@ private fun InstructionsCard() {
     }
 }
 
-// ── Layout wrapper ────────────────────────────────────────────────────────────
-
 @Composable
 private fun ContentWrapper(content: @Composable ColumnScope.() -> Unit) {
     val scrollState = rememberScrollState()
@@ -369,8 +347,6 @@ private fun ContentWrapper(content: @Composable ColumnScope.() -> Unit) {
     )
 }
 
-// ── AWT File Dialogs ──────────────────────────────────────────────────────────
-// Fixed: onResult now fires on BOTH confirm AND cancel
 @Composable
 private fun FileChooserDialog(
     title: String,
@@ -382,10 +358,10 @@ private fun FileChooserDialog(
             object : FileDialog(null as Frame?, title, LOAD) {
                 override fun setVisible(value: Boolean) {
                     super.setVisible(value)
-                    if (value) {                           // called after dialog closes
+                    if (value) {                           
                         val f = if (file != null && directory != null)
                             File(directory, file) else null
-                        onResult(f)                        // null = user cancelled → still resets showFilePicker
+                        onResult(f)                      
                     }
                 }
             }.also { it.filenameFilter = filter }
