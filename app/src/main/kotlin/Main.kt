@@ -4,7 +4,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Window
 import androidx.compose.ui.window.WindowState
 import androidx.compose.ui.window.application
-import ui.components.LocalAwtWindow   // ← your own local
+import ui.components.LocalAwtWindow   
 
 fun main() = application {
     Window(
@@ -12,7 +12,6 @@ fun main() = application {
         title          = "Grade Calculator",
         state          = WindowState(size = DpSize(1100.dp, 720.dp))
     ) {
-        // 'window' here is ComposeWindow, available directly in FrameWindowScope
         CompositionLocalProvider(LocalAwtWindow provides window) {
             App()
         }
